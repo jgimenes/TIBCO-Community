@@ -1,15 +1,172 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003">
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/schemas/XML_TO_JSON_AND_JSON_TO_XML/Shared Resources/Schemas/Schema.xsd" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schemas/USER-SCHEMA.xsd" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions">
+    <xs:import xmlns:xs="http://www.w3.org/2001/XMLSchema" namespace="http://www.tibco.com/ns/no_namespace_schema_location/Shared Resources/Schemas/USER-SCHEMA.xsd" schemaLocation="/Shared Resources/Schemas/USER-SCHEMA.xsd"/>
     <pd:name>Processes/Message Transformation.process</pd:name>
     <pd:description>This process will handle the transformation of XML messages into JSON and JSON messages into XML.</pd:description>
     <pd:startName>Start</pd:startName>
     <pd:startX>150</pd:startX>
-    <pd:startY>64</pd:startY>
+    <pd:startY>61</pd:startY>
     <pd:returnBindings/>
     <pd:endName>End</pd:endName>
-    <pd:endX>450</pd:endX>
-    <pd:endY>64</pd:endY>
+    <pd:endX>618</pd:endX>
+    <pd:endY>61</pd:endY>
     <pd:errorSchemas/>
     <pd:processVariables/>
     <pd:targetNamespace>http://xmlns.example.com/1694182258556</pd:targetNamespace>
+    <pd:activity name="XML to JSON">
+        <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+        <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+        <pd:x>467</pd:x>
+        <pd:y>61</pd:y>
+        <config>
+            <fileName>MessageTransformationXMLtoJSON</fileName>
+            <packageName>Processes.MessageTransformation</packageName>
+            <fullsource>package Processes.MessageTransformation;
+import java.util.*;
+import java.io.*;
+import java.io.ByteArrayInputStream;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
+import de.odysseus.staxon.json.JsonXMLConfig;
+import de.odysseus.staxon.json.JsonXMLConfigBuilder;
+import de.odysseus.staxon.json.JsonXMLOutputFactory;
+import de.odysseus.staxon.xml.util.PrettyXMLStreamWriter;
+public class MessageTransformationXMLtoJSON{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected String xmlMessage = "";
+	protected String jsonMessage = "";
+	public String getxmlMessage() {
+		return xmlMessage;
+	}
+	public void setxmlMessage(String val) {
+		xmlMessage = val;
+	}
+	public String getjsonMessage() {
+		return jsonMessage;
+	}
+	public void setjsonMessage(String val) {
+		jsonMessage = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public MessageTransformationXMLtoJSON() {
+	}
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : String xmlMessage
+	Out : String jsonMessage
+* Available Variables: DO NOT MODIFY *****/
+InputStream input = new ByteArrayInputStream(xmlMessage.getBytes("UTF-8"));
+
+JsonXMLConfig config = new JsonXMLConfigBuilder().autoArray(true).autoPrimitive(true).prettyPrint(true).build();
+XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(input);
+
+Writer output = new StringWriter();
+XMLEventWriter writer = new JsonXMLOutputFactory(config).createXMLEventWriter(output);
+
+writer.add(reader);
+     
+reader.close();
+writer.close();
+
+jsonMessage = output.toString();
+}
+}
+</fullsource>
+            <inputData>
+                <row>
+                    <fieldName>xmlMessage</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>optional</fieldRequired>
+                </row>
+            </inputData>
+            <outputData>
+                <row>
+                    <fieldName>jsonMessage</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>optional</fieldRequired>
+                </row>
+            </outputData>
+            <byteCode>
+                <class>
+                    <name>MessageTransformationXMLtoJSON</name>
+                    <byteCode>yv66vgAAADQAYwkAGgAuCQAaAC8KABsAMAgAMQcAMggAMwoANAA1CgAFADYHADcKAAkAMAoACQA4CgAJADkKAAkAOgoACQA7CgA8AD0KADwAPgcAPwoAEQAwBwBACgATAEEKABMAQgsAQwBECwBFAEYLAEMARgoAGwBHBwBIBwBJAQAKeG1sTWVzc2FnZQEAEkxqYXZhL2xhbmcvU3RyaW5nOwEAC2pzb25NZXNzYWdlAQANZ2V0eG1sTWVzc2FnZQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEADXNldHhtbE1lc3NhZ2UBABUoTGphdmEvbGFuZy9TdHJpbmc7KVYBAA5nZXRqc29uTWVzc2FnZQEADnNldGpzb25NZXNzYWdlAQAGPGluaXQ+AQADKClWAQAGaW52b2tlAQAKRXhjZXB0aW9ucwcASgEAClNvdXJjZUZpbGUBACNNZXNzYWdlVHJhbnNmb3JtYXRpb25YTUx0b0pTT04uamF2YQwAHAAdDAAeAB0MACcAKAEAAAEAHGphdmEvaW8vQnl0ZUFycmF5SW5wdXRTdHJlYW0BAAVVVEYtOAcASwwATABNDAAnAE4BACxkZS9vZHlzc2V1cy9zdGF4b24vanNvbi9Kc29uWE1MQ29uZmlnQnVpbGRlcgwATwBQDABRAFAMAFIAUAwAUwBUBwBVDABWAFcMAFgAWQEAFGphdmEvaW8vU3RyaW5nV3JpdGVyAQAsZGUvb2R5c3NldXMvc3RheG9uL2pzb24vSnNvblhNTE91dHB1dEZhY3RvcnkMACcAWgwAWwBcBwBdDABeAF8HAGAMAGEAKAwAYgAgAQA+UHJvY2Vzc2VzL01lc3NhZ2VUcmFuc2Zvcm1hdGlvbi9NZXNzYWdlVHJhbnNmb3JtYXRpb25YTUx0b0pTT04BABBqYXZhL2xhbmcvT2JqZWN0AQATamF2YS9sYW5nL0V4Y2VwdGlvbgEAEGphdmEvbGFuZy9TdHJpbmcBAAhnZXRCeXRlcwEAFihMamF2YS9sYW5nL1N0cmluZzspW0IBAAUoW0IpVgEACWF1dG9BcnJheQEAMShaKUxkZS9vZHlzc2V1cy9zdGF4b24vanNvbi9Kc29uWE1MQ29uZmlnQnVpbGRlcjsBAA1hdXRvUHJpbWl0aXZlAQALcHJldHR5UHJpbnQBAAVidWlsZAEAKSgpTGRlL29keXNzZXVzL3N0YXhvbi9qc29uL0pzb25YTUxDb25maWc7AQAgamF2YXgveG1sL3N0cmVhbS9YTUxJbnB1dEZhY3RvcnkBAAtuZXdJbnN0YW5jZQEAJCgpTGphdmF4L3htbC9zdHJlYW0vWE1MSW5wdXRGYWN0b3J5OwEAFGNyZWF0ZVhNTEV2ZW50UmVhZGVyAQA4KExqYXZhL2lvL0lucHV0U3RyZWFtOylMamF2YXgveG1sL3N0cmVhbS9YTUxFdmVudFJlYWRlcjsBACooTGRlL29keXNzZXVzL3N0YXhvbi9qc29uL0pzb25YTUxDb25maWc7KVYBABRjcmVhdGVYTUxFdmVudFdyaXRlcgEAMyhMamF2YS9pby9Xcml0ZXI7KUxqYXZheC94bWwvc3RyZWFtL1hNTEV2ZW50V3JpdGVyOwEAH2phdmF4L3htbC9zdHJlYW0vWE1MRXZlbnRXcml0ZXIBAANhZGQBACQoTGphdmF4L3htbC9zdHJlYW0vWE1MRXZlbnRSZWFkZXI7KVYBAB9qYXZheC94bWwvc3RyZWFtL1hNTEV2ZW50UmVhZGVyAQAFY2xvc2UBAAh0b1N0cmluZwAhABoAGwAAAAIABAAcAB0AAAAEAB4AHQAAAAYAAQAfACAAAQAhAAAAHQABAAEAAAAFKrQAAbAAAAABACIAAAAGAAEAAAARAAEAIwAkAAEAIQAAACIAAgACAAAABiortQABsQAAAAEAIgAAAAoAAgAAABQABQAVAAEAJQAgAAEAIQAAAB0AAQABAAAABSq0AAKwAAAAAQAiAAAABgABAAAAFwABACYAJAABACEAAAAiAAIAAgAAAAYqK7UAArEAAAABACIAAAAKAAIAAAAaAAUAGwABACcAKAABACEAAAA1AAIAAQAAABEqtwADKhIEtQABKhIEtQACsQAAAAEAIgAAABIABAAAAB0ABAAOAAoADwAQAB4AAQApACgAAgAhAAAAowAEAAYAAABnuwAFWSq0AAESBrYAB7cACEy7AAlZtwAKBLYACwS2AAwEtgANtgAOTbgADyu2ABBOuwARWbcAEjoEuwATWSy3ABQZBLYAFToFGQUtuQAWAgAtuQAXAQAZBbkAGAEAKhkEtgAZtQACsQAAAAEAIgAAACoACgAAACQAEQAmACgAJwAwACkAOQAqAEgALABQAC4AVgAvAF0AMQBmADIAKgAAAAQAAQArAAEALAAAAAIALQ==</byteCode>
+                </class>
+            </byteCode>
+        </config>
+        <pd:inputBindings>
+            <javaCodeActivityInput>
+                <xmlMessage>
+                    <xsl:value-of select="tib:render-xml($Map-Data-Input/users, true(), true())"/>
+                </xmlMessage>
+            </javaCodeActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data Input">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>281</pd:x>
+        <pd:y>61</pd:y>
+        <config>
+            <element ref="pfx2:users"/>
+        </config>
+        <pd:inputBindings>
+            <users>
+                <user>
+                    <id>
+                        <xsl:value-of select="1"/>
+                    </id>
+                    <name>
+                        <xsl:value-of select="&quot;user 01&quot;"/>
+                    </name>
+                    <email>
+                        <xsl:value-of select="&quot;user01@e-mail.com&quot;"/>
+                    </email>
+                </user>
+                <user>
+                    <id>
+                        <xsl:value-of select="2"/>
+                    </id>
+                    <name>
+                        <xsl:value-of select="&quot;user 02&quot;"/>
+                    </name>
+                    <email>
+                        <xsl:value-of select="&quot;user02@e-mail.com&quot;"/>
+                    </email>
+                </user>
+                <user>
+                    <id>
+                        <xsl:value-of select="3"/>
+                    </id>
+                    <name>
+                        <xsl:value-of select="&quot;user 03&quot;"/>
+                    </name>
+                    <email>
+                        <xsl:value-of select="&quot;user03@e-mail.com&quot;"/>
+                    </email>
+                </user>
+            </users>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Map Data Input</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Map Data Input</pd:from>
+        <pd:to>XML to JSON</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>XML to JSON</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
 </pd:ProcessDefinition>

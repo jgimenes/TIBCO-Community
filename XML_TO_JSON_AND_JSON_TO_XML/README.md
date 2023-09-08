@@ -42,8 +42,6 @@ For this example, I will use the following message as a foundation:
 ~~~xml
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	 xmlns="http://www.tibco.com/schemas/XML_TO_JSON_AND_JSON_TO_XML/Shared Resources/Schemas/Schema.xsd"
-	 targetNamespace="http://www.tibco.com/schemas/XML_TO_JSON_AND_JSON_TO_XML/Shared Resources/Schemas/Schema.xsd"
 	 elementFormDefault="qualified"
 	 attributeFormDefault="unqualified">
 	<xs:complexType name="UserType">
@@ -90,6 +88,67 @@ For this example, I will use the following message as a foundation:
 
 ![Image 09](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_09_XML_TO_JSON_AND_JSON_TO_XML.png)
 
+10- In the **Message Transformation** process, insert a **Mapper activity**. In this activity, we will map our **input** XML message.
 
+![Image 10](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_10_XML_TO_JSON_AND_JSON_TO_XML.png)
 
+11- In the **Input Editor** tab, make a reference to the **USER-SCHEMA** schema created in step 2.
+
+![Image 11](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_11_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+12- In the **Input** tab, complete the fields with the information as demonstrated in the example image below.
+
+![Image 12](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_12_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+13- Next, add a **Java Code** activity and rename it as **XML to JSON**.
+
+![Image 13](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_13_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+14- Now, in the **Configuration** tab add the input parameters, which I will name **xmlMessage**, and the output parameter, which I will name **jsonMessage**.
+
+![Image 14](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_14_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+15- Navigate to the **Code** tab, select the **Full Class** option, and beneath the line import java.io.*;, include the following imports.
+
+~~~~java
+import java.io.ByteArrayInputStream;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
+import de.odysseus.staxon.json.JsonXMLConfig;
+import de.odysseus.staxon.json.JsonXMLConfigBuilder;
+import de.odysseus.staxon.json.JsonXMLOutputFactory;
+import de.odysseus.staxon.xml.util.PrettyXMLStreamWriter;
+~~~~
+
+Click on the Compile button.
+
+![Image 15](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_15_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+16- Now, choose the **Invoke Method Body** option, and after the line **/* Available Variables: DO NOT MODIFY *****/**, insert the following code.
+
+~~~~java
+InputStream input = new ByteArrayInputStream(xmlMessage.getBytes("UTF-8"));
+
+JsonXMLConfig config = new JsonXMLConfigBuilder().autoArray(true).autoPrimitive(true).prettyPrint(true).build();
+XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(input);
+
+Writer output = new StringWriter();
+XMLEventWriter writer = new JsonXMLOutputFactory(config).createXMLEventWriter(output);
+
+writer.add(reader);
+     
+reader.close();
+writer.close();
+
+jsonMessage = output.toString();
+~~~~
+
+Click on the Compile button.
+
+![Image 16](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_16_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+17- In the **Input** tab, map the output of the **Mapper activity** to the **xmlMessage** field, encapsulating it within the **render-xml()** function.
+
+![Image 17](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_17_XML_TO_JSON_AND_JSON_TO_XML.png)
 
