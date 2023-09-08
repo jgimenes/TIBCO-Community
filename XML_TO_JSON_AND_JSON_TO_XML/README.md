@@ -152,3 +152,123 @@ Click on the Compile button.
 
 ![Image 17](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_17_XML_TO_JSON_AND_JSON_TO_XML.png)
 
+18- We will now add a new **Java Code** activity responsible for converting the **JSON message into XML**. Rename the activity to **JSON to XML**.
+
+![Image 18](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_18_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+19- Now, in the Configuration tab add the input parameters, which I will name **jsonMessage**, and the output parameter, which I will name **xmlMessage**.
+
+![Image 19](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_19_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+20- Navigate to the **Code** tab, select the **Full Class** option, and beneath the line import java.io.*;, include the following imports.
+
+~~~~java
+import java.io.ByteArrayInputStream;
+import com.sun.xml.internal.stream.XMLOutputFactoryImpl;
+import de.odysseus.staxon.json.JsonXMLConfig;
+import de.odysseus.staxon.json.JsonXMLConfigBuilder;
+import de.odysseus.staxon.json.JsonXMLInputFactory;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
+~~~~
+
+Click on the Compile button.
+
+![Image 20](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_20_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+21- Now, choose the **Invoke Method Body** option, and after the line **/* Available Variables: DO NOT MODIFY *****/**, insert the following code.
+
+~~~~java
+InputStream input = new ByteArrayInputStream(jsonMessage.getBytes("UTF-8"));
+
+JsonXMLConfig config = new JsonXMLConfigBuilder().prettyPrint(false).build();
+
+XMLEventReader reader = new JsonXMLInputFactory(config).createXMLEventReader(input, "UTF-8");
+
+ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+XMLEventWriter writer = new XMLOutputFactoryImpl().createXMLEventWriter(output, "UTF-8");
+
+writer.add(reader);
+
+reader.close();
+writer.close();
+
+xmlMessage = output.toString();
+~~~~
+
+Click on the Compile button.
+
+![Image 21](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_21_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+22- Navigate to the **Input** tab and proceed to map the XML returned by the **XML to JSON** activity to the **jsonMessage** element. 
+
+![Image 22](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_22_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+23- Let's insert an activity that will handle the parsing of the **XML message**. Click on **Add Resource => XML Activities => Parse XML**.
+
+![Image 23](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_23_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+24- In the **Configuration** tab, modify the **Input Style** to **text**.
+
+![Image 24](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_24_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+25- In the **Output Editor** tab, make a reference to the **USER-SCHEMA** schema created in step 3.
+
+![Image 25](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_25_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+26 - In the **Input** tab, map the output of the **JSON to XML** activity to the **xmlString** element.
+
+![Image 26](https://github.com/jgimenes/TIBCO-Community/blob/master/images/IMAGE_26_XML_TO_JSON_AND_JSON_TO_XML.png)
+
+Now we have a fully functional process capable of transforming both **XML messages into JSON and JSON messages into XML**, let's proceed to run the test and examine the results.
+
+During the test execution, when we examine the output of the **XML to JSON** activity, we can observe the following result:
+
+~~~~json
+{
+	"users": {
+		"user": [
+			{
+				"id": 1,
+				"name": "user 01",
+				"email": "user01@e-mail.com"
+			},
+			{
+				"id": 2,
+				"name": "user 02",
+				"email": "user02@e-mail.com"
+			},
+			{
+				"id": 3,
+				"name": "user 03",
+				"email": "user03@e-mail.com"
+			}
+		]
+	}
+}
+~~~~
+
+This JSON message is subsequently forwarded to the JSON to XML activity, which converts it back into an XML message. Consequently, when we examine the output of the Parse XML activity, we will once again have an XML message.
+
+~~~~xml
+<?xml version = "1.0" encoding = "UTF-8"?>
+<users>
+	<?xml-multiple user?>
+	<user>
+		<id>1</id>
+		<name>user 01</name>
+		<email>user01@e-mail.com</email>
+	</user>
+	<user>
+		<id>2</id>
+		<name>user 02</name>
+		<email>user02@e-mail.com</email>
+	</user>
+	<user>
+		<id>3</id>
+		<name>user 03</name>
+		<email>user03@e-mail.com</email>
+	</user>
+</users>
+~~~~

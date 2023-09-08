@@ -5,19 +5,178 @@
     <pd:description>This process will handle the transformation of XML messages into JSON and JSON messages into XML.</pd:description>
     <pd:startName>Start</pd:startName>
     <pd:startX>150</pd:startX>
-    <pd:startY>61</pd:startY>
+    <pd:startY>59</pd:startY>
     <pd:returnBindings/>
     <pd:endName>End</pd:endName>
-    <pd:endX>618</pd:endX>
-    <pd:endY>61</pd:endY>
+    <pd:endType/>
+    <pd:endX>955</pd:endX>
+    <pd:endY>59</pd:endY>
     <pd:errorSchemas/>
     <pd:processVariables/>
     <pd:targetNamespace>http://xmlns.example.com/1694182258556</pd:targetNamespace>
+    <pd:activity name="JSON to XML">
+        <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
+        <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
+        <pd:x>631</pd:x>
+        <pd:y>57</pd:y>
+        <config>
+            <fileName>MessageTransformationJSONtoXML</fileName>
+            <packageName>Processes.MessageTransformation</packageName>
+            <fullsource>package Processes.MessageTransformation;
+import java.util.*;
+import java.io.*;
+import java.io.ByteArrayInputStream;
+import com.sun.xml.internal.stream.XMLOutputFactoryImpl;
+import de.odysseus.staxon.json.JsonXMLConfig;
+import de.odysseus.staxon.json.JsonXMLConfigBuilder;
+import de.odysseus.staxon.json.JsonXMLInputFactory;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
+public class MessageTransformationJSONtoXML{
+/****** START SET/GET METHOD, DO NOT MODIFY *****/
+	protected String jsonMessage = "";
+	protected String xmlMessage = "";
+	public String getjsonMessage() {
+		return jsonMessage;
+	}
+	public void setjsonMessage(String val) {
+		jsonMessage = val;
+	}
+	public String getxmlMessage() {
+		return xmlMessage;
+	}
+	public void setxmlMessage(String val) {
+		xmlMessage = val;
+	}
+/****** END SET/GET METHOD, DO NOT MODIFY *****/
+	public MessageTransformationJSONtoXML() {
+	}
+	public void invoke() throws Exception {
+/* Available Variables: DO NOT MODIFY
+	In  : String jsonMessage
+	Out : String xmlMessage
+* Available Variables: DO NOT MODIFY *****/
+
+InputStream input = new ByteArrayInputStream(jsonMessage.getBytes("UTF-8"));
+
+JsonXMLConfig config = new JsonXMLConfigBuilder().prettyPrint(false).build();
+
+XMLEventReader reader = new JsonXMLInputFactory(config).createXMLEventReader(input, "UTF-8");
+
+ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+XMLEventWriter writer = new XMLOutputFactoryImpl().createXMLEventWriter(output, "UTF-8");
+
+writer.add(reader);
+
+reader.close();
+writer.close();
+
+xmlMessage = output.toString();
+
+
+}
+}
+</fullsource>
+            <inputData>
+                <row>
+                    <fieldName>jsonMessage</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>optional</fieldRequired>
+                </row>
+            </inputData>
+            <outputData>
+                <row>
+                    <fieldName>xmlMessage</fieldName>
+                    <fieldType>string</fieldType>
+                    <fieldRequired>optional</fieldRequired>
+                </row>
+            </outputData>
+            <byteCode>
+                <class>
+                    <name>MessageTransformationJSONtoXML</name>
+                    <byteCode>yv66vgAAADQAWgkAGQAtCQAZAC4KABoALwgAMAcAMQgAMgoAMwA0CgAFADUHADYKAAkALwoACQA3CgAJADgHADkKAA0AOgoADQA7BwA8CgAQAC8HAD0KABIALwoAEgA+CwA/AEALAEEAQgsAPwBCCgAQAEMHAEQHAEUBAAtqc29uTWVzc2FnZQEAEkxqYXZhL2xhbmcvU3RyaW5nOwEACnhtbE1lc3NhZ2UBAA5nZXRqc29uTWVzc2FnZQEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEADnNldGpzb25NZXNzYWdlAQAVKExqYXZhL2xhbmcvU3RyaW5nOylWAQANZ2V0eG1sTWVzc2FnZQEADXNldHhtbE1lc3NhZ2UBAAY8aW5pdD4BAAMoKVYBAAZpbnZva2UBAApFeGNlcHRpb25zBwBGAQAKU291cmNlRmlsZQEAI01lc3NhZ2VUcmFuc2Zvcm1hdGlvbkpTT050b1hNTC5qYXZhDAAbABwMAB0AHAwAJgAnAQAAAQAcamF2YS9pby9CeXRlQXJyYXlJbnB1dFN0cmVhbQEABVVURi04BwBHDABIAEkMACYASgEALGRlL29keXNzZXVzL3N0YXhvbi9qc29uL0pzb25YTUxDb25maWdCdWlsZGVyDABLAEwMAE0ATgEAK2RlL29keXNzZXVzL3N0YXhvbi9qc29uL0pzb25YTUxJbnB1dEZhY3RvcnkMACYATwwAUABRAQAdamF2YS9pby9CeXRlQXJyYXlPdXRwdXRTdHJlYW0BADBjb20vc3VuL3htbC9pbnRlcm5hbC9zdHJlYW0vWE1MT3V0cHV0RmFjdG9yeUltcGwMAFIAUwcAVAwAVQBWBwBXDABYACcMAFkAHwEAPlByb2Nlc3Nlcy9NZXNzYWdlVHJhbnNmb3JtYXRpb24vTWVzc2FnZVRyYW5zZm9ybWF0aW9uSlNPTnRvWE1MAQAQamF2YS9sYW5nL09iamVjdAEAE2phdmEvbGFuZy9FeGNlcHRpb24BABBqYXZhL2xhbmcvU3RyaW5nAQAIZ2V0Qnl0ZXMBABYoTGphdmEvbGFuZy9TdHJpbmc7KVtCAQAFKFtCKVYBAAtwcmV0dHlQcmludAEAMShaKUxkZS9vZHlzc2V1cy9zdGF4b24vanNvbi9Kc29uWE1MQ29uZmlnQnVpbGRlcjsBAAVidWlsZAEAKSgpTGRlL29keXNzZXVzL3N0YXhvbi9qc29uL0pzb25YTUxDb25maWc7AQAqKExkZS9vZHlzc2V1cy9zdGF4b24vanNvbi9Kc29uWE1MQ29uZmlnOylWAQAUY3JlYXRlWE1MRXZlbnRSZWFkZXIBAEooTGphdmEvaW8vSW5wdXRTdHJlYW07TGphdmEvbGFuZy9TdHJpbmc7KUxqYXZheC94bWwvc3RyZWFtL1hNTEV2ZW50UmVhZGVyOwEAFGNyZWF0ZVhNTEV2ZW50V3JpdGVyAQBLKExqYXZhL2lvL091dHB1dFN0cmVhbTtMamF2YS9sYW5nL1N0cmluZzspTGphdmF4L3htbC9zdHJlYW0vWE1MRXZlbnRXcml0ZXI7AQAfamF2YXgveG1sL3N0cmVhbS9YTUxFdmVudFdyaXRlcgEAA2FkZAEAJChMamF2YXgveG1sL3N0cmVhbS9YTUxFdmVudFJlYWRlcjspVgEAH2phdmF4L3htbC9zdHJlYW0vWE1MRXZlbnRSZWFkZXIBAAVjbG9zZQEACHRvU3RyaW5nACEAGQAaAAAAAgAEABsAHAAAAAQAHQAcAAAABgABAB4AHwABACAAAAAdAAEAAQAAAAUqtAABsAAAAAEAIQAAAAYAAQAAABAAAQAiACMAAQAgAAAAIgACAAIAAAAGKiu1AAGxAAAAAQAhAAAACgACAAAAEwAFABQAAQAkAB8AAQAgAAAAHQABAAEAAAAFKrQAArAAAAABACEAAAAGAAEAAAAWAAEAJQAjAAEAIAAAACIAAgACAAAABiortQACsQAAAAEAIQAAAAoAAgAAABkABQAaAAEAJgAnAAEAIAAAADUAAgABAAAAESq3AAMqEgS1AAEqEgS1AAKxAAAAAQAhAAAAEgAEAAAAHAAEAA0ACgAOABAAHQABACgAJwACACAAAACjAAQABgAAAGe7AAVZKrQAARIGtgAHtwAITLsACVm3AAoDtgALtgAMTbsADVkstwAOKxIGtgAPTrsAEFm3ABE6BLsAElm3ABMZBBIGtgAUOgUZBS25ABUCAC25ABYBABkFuQAXAQAqGQS2ABi1AAKxAAAAAQAhAAAAKgAKAAAAJAARACYAIAAoAC8AKgA4ACwASAAuAFAAMABWADEAXQAzAGYANgApAAAABAABACoAAQArAAAAAgAs</byteCode>
+                </class>
+            </byteCode>
+        </config>
+        <pd:inputBindings>
+            <javaCodeActivityInput>
+                <xsl:if test="$XML-to-JSON/javaCodeActivityOutput/jsonMessage">
+                    <jsonMessage>
+                        <xsl:value-of select="$XML-to-JSON/javaCodeActivityOutput/jsonMessage"/>
+                    </jsonMessage>
+                </xsl:if>
+            </javaCodeActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Map Data Input">
+        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
+        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
+        <pd:x>281</pd:x>
+        <pd:y>59</pd:y>
+        <config>
+            <element ref="pfx2:users"/>
+        </config>
+        <pd:inputBindings>
+            <users>
+                <user>
+                    <id>
+                        <xsl:value-of select="1"/>
+                    </id>
+                    <name>
+                        <xsl:value-of select="&quot;user 01&quot;"/>
+                    </name>
+                    <email>
+                        <xsl:value-of select="&quot;user01@e-mail.com&quot;"/>
+                    </email>
+                </user>
+                <user>
+                    <id>
+                        <xsl:value-of select="2"/>
+                    </id>
+                    <name>
+                        <xsl:value-of select="&quot;user 02&quot;"/>
+                    </name>
+                    <email>
+                        <xsl:value-of select="&quot;user02@e-mail.com&quot;"/>
+                    </email>
+                </user>
+                <user>
+                    <id>
+                        <xsl:value-of select="3"/>
+                    </id>
+                    <name>
+                        <xsl:value-of select="&quot;user 03&quot;"/>
+                    </name>
+                    <email>
+                        <xsl:value-of select="&quot;user03@e-mail.com&quot;"/>
+                    </email>
+                </user>
+            </users>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Parse XML">
+        <pd:type>com.tibco.plugin.xml.XMLParseActivity</pd:type>
+        <pd:resourceType>ae.activities.XMLParseActivity</pd:resourceType>
+        <pd:x>791</pd:x>
+        <pd:y>58</pd:y>
+        <config>
+            <inputStyle>text</inputStyle>
+            <xsdVersion>default</xsdVersion>
+            <validateOutput>true</validateOutput>
+            <term ref="pfx2:users"/>
+        </config>
+        <pd:inputBindings>
+            <xmlString>
+                <xsl:value-of select="$JSON-to-XML/javaCodeActivityOutput/xmlMessage"/>
+            </xmlString>
+        </pd:inputBindings>
+    </pd:activity>
     <pd:activity name="XML to JSON">
         <pd:type>com.tibco.plugin.java.JavaActivity</pd:type>
         <pd:resourceType>ae.javapalette.javaActivity</pd:resourceType>
         <pd:x>467</pd:x>
-        <pd:y>61</pd:y>
+        <pd:y>59</pd:y>
         <config>
             <fileName>MessageTransformationXMLtoJSON</fileName>
             <packageName>Processes.MessageTransformation</packageName>
@@ -102,52 +261,6 @@ jsonMessage = output.toString();
             </javaCodeActivityInput>
         </pd:inputBindings>
     </pd:activity>
-    <pd:activity name="Map Data Input">
-        <pd:type>com.tibco.plugin.mapper.MapperActivity</pd:type>
-        <pd:resourceType>ae.activities.MapperActivity</pd:resourceType>
-        <pd:x>281</pd:x>
-        <pd:y>61</pd:y>
-        <config>
-            <element ref="pfx2:users"/>
-        </config>
-        <pd:inputBindings>
-            <users>
-                <user>
-                    <id>
-                        <xsl:value-of select="1"/>
-                    </id>
-                    <name>
-                        <xsl:value-of select="&quot;user 01&quot;"/>
-                    </name>
-                    <email>
-                        <xsl:value-of select="&quot;user01@e-mail.com&quot;"/>
-                    </email>
-                </user>
-                <user>
-                    <id>
-                        <xsl:value-of select="2"/>
-                    </id>
-                    <name>
-                        <xsl:value-of select="&quot;user 02&quot;"/>
-                    </name>
-                    <email>
-                        <xsl:value-of select="&quot;user02@e-mail.com&quot;"/>
-                    </email>
-                </user>
-                <user>
-                    <id>
-                        <xsl:value-of select="3"/>
-                    </id>
-                    <name>
-                        <xsl:value-of select="&quot;user 03&quot;"/>
-                    </name>
-                    <email>
-                        <xsl:value-of select="&quot;user03@e-mail.com&quot;"/>
-                    </email>
-                </user>
-            </users>
-        </pd:inputBindings>
-    </pd:activity>
     <pd:transition>
         <pd:from>Start</pd:from>
         <pd:to>Map Data Input</pd:to>
@@ -164,6 +277,20 @@ jsonMessage = output.toString();
     </pd:transition>
     <pd:transition>
         <pd:from>XML to JSON</pd:from>
+        <pd:to>JSON to XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>JSON to XML</pd:from>
+        <pd:to>Parse XML</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Parse XML</pd:from>
         <pd:to>End</pd:to>
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>
